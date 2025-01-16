@@ -1,8 +1,8 @@
 import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { WagmiConfig, configureChains, createConfig } from 'wagmi'
 import { bscTestnet } from 'wagmi/chains'
-import { InjectedConnector } from 'wagmi/connectors/injected'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { injected } from 'wagmi/connectors'
+import { walletConnect } from 'wagmi/connectors'
 import { publicProvider } from 'wagmi/providers/public'
 
 const { chains, publicClient } = configureChains(
@@ -22,14 +22,12 @@ const metadata = {
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors: [
-    new InjectedConnector({ chains }),
-    new WalletConnectConnector({
-      chains,
-      options: {
-        projectId,
-        metadata,
-      },
-    }),
+    injected(),
+    walletConnect({ 
+      projectId,
+      metadata,
+      showQrModal: true 
+    })
   ],
   publicClient,
 })
