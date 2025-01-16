@@ -1,8 +1,7 @@
-import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { WagmiConfig, createConfig } from 'wagmi'
 import { bscTestnet } from 'wagmi/chains'
-import { injected } from 'wagmi/connectors'
 import { http } from 'viem'
+import { injected } from 'wagmi/connectors'
 
 const config = createConfig({
   chains: [bscTestnet],
@@ -13,8 +12,6 @@ const config = createConfig({
     injected()
   ],
 })
-
-createWeb3Modal({ wagmiConfig: config, projectId: '', chains: [bscTestnet] })
 
 export function Web3Provider({ children }: { children: React.ReactNode }) {
   return <WagmiConfig config={config}>{children}</WagmiConfig>
