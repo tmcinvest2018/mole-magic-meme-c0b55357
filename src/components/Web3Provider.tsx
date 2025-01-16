@@ -1,39 +1,21 @@
 import { createWeb3Modal } from '@web3modal/wagmi/react'
-import { WagmiConfig, configureChains, createConfig } from 'wagmi'
+import { WagmiConfig, createConfig } from 'wagmi'
 import { bscTestnet } from 'wagmi/chains'
 import { injected } from 'wagmi/connectors'
-import { walletConnect } from 'wagmi/connectors'
-import { publicProvider } from 'wagmi/providers/public'
+import { http } from 'viem'
 
-const { chains, publicClient } = configureChains(
-  [bscTestnet],
-  [publicProvider()]
-)
-
-const projectId = 'YOUR_WALLET_CONNECT_PROJECT_ID' // Replace with your WalletConnect project ID
-
-const metadata = {
-  name: 'MORO Token',
-  description: 'Morocco Mole Meme Coin',
-  url: 'https://your-website.com', // Replace with your website
-  icons: ['https://your-website.com/icon.png'] // Replace with your icon
-}
-
-const wagmiConfig = createConfig({
-  autoConnect: true,
+const config = createConfig({
+  chains: [bscTestnet],
+  transports: {
+    [bscTestnet.id]: http('https://data-seed-prebsc-1-s1.binance.org:8545'),
+  },
   connectors: [
-    injected(),
-    walletConnect({ 
-      projectId,
-      metadata,
-      showQrModal: true 
-    })
+    injected()
   ],
-  publicClient,
 })
 
-createWeb3Modal({ wagmiConfig, projectId, chains })
+createWeb3Modal({ wagmiConfig: config, projectId: '', chains: [bscTestnet] })
 
 export function Web3Provider({ children }: { children: React.ReactNode }) {
-  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>
+  return <WagmiConfig config={config}>{children}</WagmiConfig>
 }
