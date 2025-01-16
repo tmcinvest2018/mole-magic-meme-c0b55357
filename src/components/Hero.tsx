@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import { WalletConnect } from "./WalletConnect";
+import { PurchaseToken } from "./PurchaseToken";
 
 export const Hero = () => {
   return (
@@ -19,13 +21,9 @@ export const Hero = () => {
           <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Join the crypto underground revolution with Morocco Mole Meme Coin. A token for the community, by the community.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-all transform hover:scale-105">
-              Buy MORO
-            </button>
-            <button className="px-8 py-3 bg-white text-primary border-2 border-primary rounded-lg hover:bg-primary/10 transition-all transform hover:scale-105">
-              Join Community
-            </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <WalletConnect />
+            <PurchaseToken />
           </div>
         </motion.div>
         <motion.div

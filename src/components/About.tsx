@@ -60,7 +60,7 @@ export const About = () => {
           <img
             src="/lovable-uploads/51a42c25-c995-41d3-9515-d39c77766a22.png"
             alt="Morocco Mole Vision"
-            className="max-w-2xl mx-auto rounded-2xl shadow-2xl"
+            className="w-full max-w-2xl mx-auto rounded-2xl shadow-2xl object-cover"
           />
         </motion.div>
       </div>

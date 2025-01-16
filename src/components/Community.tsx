@@ -25,7 +25,7 @@ export const Community = () => {
           <img
             src="/lovable-uploads/363c688d-5a9a-413b-a0f6-c5525cebaab8.png"
             alt="Morocco Mole Community"
-            className="max-w-2xl mx-auto rounded-2xl shadow-2xl"
+            className="w-full max-w-2xl mx-auto rounded-2xl shadow-2xl object-cover"
           />
         </motion.div>
 
