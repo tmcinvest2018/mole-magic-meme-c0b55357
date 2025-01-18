@@ -1,23 +1,19 @@
-import { useAccount, useBalance, useNetwork, useSwitchNetwork } from 'wagmi'
+import { useAccount, useBalance, useContractRead } from 'wagmi'
 import { bscTestnet } from 'wagmi/chains'
-import { useContractRead } from 'wagmi'
-import { parseEther, formatEther } from 'viem'
+import { formatEther } from 'viem'
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Wallet, AlertTriangle, RefreshCw, ChartBar } from "lucide-react"
+import { Wallet, AlertTriangle, ChartBar } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { MORO_TOKEN, PRESALE_CONTRACT, PRESALE_ABI } from '@/config/contracts'
 
 const Dashboard = () => {
-  const { address, isConnected } = useAccount()
-  const { chain } = useNetwork()
-  const { switchNetwork } = useSwitchNetwork()
+  const { address, isConnected, chain } = useAccount()
   const { toast } = useToast()
 
   // Get BNB balance
   const { data: bnbBalance } = useBalance({
-    address: address,
-    watch: true,
+    address,
   })
 
   // Get MORO token balance
@@ -32,7 +28,6 @@ const Dashboard = () => {
     }],
     functionName: 'balanceOf',
     args: [address as `0x${string}`],
-    enabled: !!address,
   })
 
   // Get presale info
@@ -40,7 +35,6 @@ const Dashboard = () => {
     address: PRESALE_CONTRACT as `0x${string}`,
     abi: PRESALE_ABI,
     functionName: 'getTokensAvailable',
-    watch: true,
   })
 
   const { data: userPurchased } = useContractRead({
@@ -48,22 +42,7 @@ const Dashboard = () => {
     abi: PRESALE_ABI,
     functionName: 'getUserPurchased',
     args: [address as `0x${string}`],
-    enabled: !!address,
   })
-
-  // Switch network if not on BSC Testnet
-  const handleSwitchNetwork = async () => {
-    try {
-      await switchNetwork?.(bscTestnet.id)
-    } catch (error) {
-      console.error('Failed to switch network:', error)
-      toast({
-        title: "Network Switch Failed",
-        description: "Please try switching networks manually in your wallet",
-        variant: "destructive"
-      })
-    }
-  }
 
   if (!isConnected) {
     return (
@@ -84,7 +63,12 @@ const Dashboard = () => {
           <AlertTriangle className="mx-auto h-12 w-12 text-yellow-400 mb-4" />
           <h2 className="text-2xl font-bold mb-2">Wrong Network</h2>
           <p className="text-gray-600 mb-4">Please switch to BSC Testnet to view your dashboard</p>
-          <Button onClick={handleSwitchNetwork}>Switch to BSC Testnet</Button>
+          <Button onClick={() => {
+            toast({
+              title: "Network Switch Required",
+              description: "Please switch to BSC Testnet in your wallet",
+            })
+          }}>Switch to BSC Testnet</Button>
         </Card>
       </div>
     )
@@ -105,7 +89,7 @@ const Dashboard = () => {
             <p className="text-sm text-gray-600 mt-4">BNB Balance</p>
             <p className="font-bold">{bnbBalance?.formatted || '0'} BNB</p>
             <p className="text-sm text-gray-600 mt-4">MORO Balance</p>
-            <p className="font-bold">{moroBalance ? formatEther(moroBalance as bigint) : '0'} MORO</p>
+            <p className="font-bold">{moroBalance ? formatEther(moroBalance) : '0'} MORO</p>
           </div>
         </Card>
 
@@ -117,9 +101,9 @@ const Dashboard = () => {
           </h2>
           <div className="space-y-2">
             <p className="text-sm text-gray-600">Your Purchased Tokens</p>
-            <p className="font-bold">{userPurchased ? formatEther(userPurchased as bigint) : '0'} MORO</p>
+            <p className="font-bold">{userPurchased ? formatEther(userPurchased) : '0'} MORO</p>
             <p className="text-sm text-gray-600 mt-4">Tokens Available</p>
-            <p className="font-bold">{tokensAvailable ? formatEther(tokensAvailable as bigint) : '0'} MORO</p>
+            <p className="font-bold">{tokensAvailable ? formatEther(tokensAvailable) : '0'} MORO</p>
           </div>
         </Card>
 
@@ -133,13 +117,6 @@ const Dashboard = () => {
             <p className="font-mono text-sm truncate">{PRESALE_CONTRACT}</p>
           </div>
         </Card>
-      </div>
-
-      <div className="mt-6 flex justify-end">
-        <Button variant="outline" size="sm" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          Refresh Data
-        </Button>
       </div>
     </div>
   )

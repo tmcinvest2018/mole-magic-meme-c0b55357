@@ -12,27 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
-const PRESALE_CONTRACT = '0x33B6f94577747E7a859B5b66fB042c76BEe3A3CD'
-const USDT_CONTRACT = '0x3616C1a63F5Fc6510Ac4B720c2Ae0b739f69893B'
-
-// ABI definitions
-const PRESALE_ABI = [
-  {
-    inputs: [],
-    name: 'buyWithBNB',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [{ type: 'uint256', name: 'amount' }],
-    name: 'buyWithUSDT',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  }
-] as const;
+import { PRESALE_CONTRACT, PRESALE_ABI } from '@/config/contracts'
 
 export const PurchaseToken = () => {
   const [amount, setAmount] = useState('')
@@ -43,12 +23,14 @@ export const PurchaseToken = () => {
     address,
   })
 
-  const { writeContract: buyWithBNB } = useContractWrite({
+  const { writeAsync: buyWithBNB } = useContractWrite({
+    address: PRESALE_CONTRACT as `0x${string}`,
     abi: PRESALE_ABI,
     functionName: 'buyWithBNB',
   })
 
-  const { writeContract: buyWithUSDT } = useContractWrite({
+  const { writeAsync: buyWithUSDT } = useContractWrite({
+    address: PRESALE_CONTRACT as `0x${string}`,
     abi: PRESALE_ABI,
     functionName: 'buyWithUSDT',
   })
@@ -57,10 +39,6 @@ export const PurchaseToken = () => {
     try {
       console.log('Attempting BNB purchase...')
       const tx = await buyWithBNB({
-        abi: PRESALE_ABI,
-        address: PRESALE_CONTRACT as `0x${string}`,
-        functionName: 'buyWithBNB',
-        args: [],
         value: parseEther(amount)
       })
       console.log('BNB purchase transaction:', tx)
@@ -83,9 +61,6 @@ export const PurchaseToken = () => {
     try {
       console.log('Attempting USDT purchase...')
       const tx = await buyWithUSDT({
-        abi: PRESALE_ABI,
-        address: PRESALE_CONTRACT as `0x${string}`,
-        functionName: 'buyWithUSDT',
         args: [parseEther(amount)]
       })
       console.log('USDT purchase transaction:', tx)
