@@ -29,38 +29,38 @@ export const Dashboard = () => {
 
   return (
     <div className="fixed top-4 right-4 z-50">
-      <Card className="w-[300px] bg-white/90 backdrop-blur">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-sm font-medium flex items-center gap-2">
+      <Card className="w-[300px] bg-gradient-to-b from-orange-50 to-white border border-orange-200 shadow-lg">
+        <CardHeader className="space-y-1 pb-2">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-orange-600">
             <Wallet className="w-4 h-4" />
             {address.slice(0, 6)}...{address.slice(-4)}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2">
-              <Coins className="w-4 h-4" />
+            <span className="flex items-center gap-2 text-gray-600">
+              <Coins className="w-4 h-4 text-primary" />
               BNB Balance
             </span>
-            <span>{bnbBalance?.formatted.slice(0, 6)} BNB</span>
+            <span className="font-medium text-gray-900">{bnbBalance?.formatted.slice(0, 6)} BNB</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2">
-              <Coins className="w-4 h-4" />
+            <span className="flex items-center gap-2 text-gray-600">
+              <Coins className="w-4 h-4 text-secondary" />
               MORO Balance
             </span>
-            <span>{moroBalance?.formatted || '0'} MORO</span>
+            <span className="font-medium text-gray-900">{moroBalance?.formatted || '0'} MORO</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2">
-              <Coins className="w-4 h-4" />
+            <span className="flex items-center gap-2 text-gray-600">
+              <Coins className="w-4 h-4 text-accent" />
               Purchased
             </span>
-            <span>{purchasedAmount ? Number(purchasedAmount) : '0'} MORO</span>
+            <span className="font-medium text-gray-900">{purchasedAmount ? Number(purchasedAmount) : '0'} MORO</span>
           </div>
           <Button 
             variant="outline" 
-            className="w-full mt-2"
+            className="w-full mt-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 border-none shadow-md"
             onClick={() => navigate('/dashboard')}
           >
             View Full Dashboard
