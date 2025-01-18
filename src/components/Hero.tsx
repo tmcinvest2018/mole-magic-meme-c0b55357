@@ -1,10 +1,12 @@
 import { motion } from "framer-motion";
 import { WalletConnect } from "./WalletConnect";
 import { PurchaseToken } from "./PurchaseToken";
+import { Dashboard } from "./Dashboard";
 
 export const Hero = () => {
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-orange-50 to-white">
+      <Dashboard />
       <div className="container mx-auto px-4 py-16 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
