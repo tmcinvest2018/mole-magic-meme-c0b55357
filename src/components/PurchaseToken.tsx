@@ -16,6 +16,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 const PRESALE_CONTRACT = '0x33B6f94577747E7a859B5b66fB042c76BEe3A3CD'
 const USDT_CONTRACT = '0x3616C1a63F5Fc6510Ac4B720c2Ae0b739f69893B'
 
+// ABI definitions
+const PRESALE_ABI = [
+  {
+    inputs: [],
+    name: 'buyWithBNB',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [{ type: 'uint256', name: 'amount' }],
+    name: 'buyWithUSDT',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  }
+] as const;
+
 export const PurchaseToken = () => {
   const [amount, setAmount] = useState('')
   const { address } = useAccount()
@@ -25,49 +43,36 @@ export const PurchaseToken = () => {
     address,
   })
 
-  const { writeContract: purchaseWithBNB } = useContractWrite({
-    abi: [
-      {
-        name: 'buyWithBNB',
-        type: 'function',
-        stateMutability: 'payable',
-        inputs: [],
-        outputs: [],
-      },
-    ],
+  const { writeContract: buyWithBNB } = useContractWrite({
     address: PRESALE_CONTRACT as `0x${string}`,
+    abi: PRESALE_ABI,
     functionName: 'buyWithBNB',
   })
 
-  const { writeContract: purchaseWithUSDT } = useContractWrite({
-    abi: [
-      {
-        name: 'buyWithUSDT',
-        type: 'function',
-        stateMutability: 'nonpayable',
-        inputs: [{ type: 'uint256', name: 'amount' }],
-        outputs: [],
-      },
-    ],
+  const { writeContract: buyWithUSDT } = useContractWrite({
     address: PRESALE_CONTRACT as `0x${string}`,
+    abi: PRESALE_ABI,
     functionName: 'buyWithUSDT',
   })
 
   const handlePurchaseWithBNB = async () => {
     try {
       console.log('Attempting BNB purchase...')
-      await purchaseWithBNB({
-        value: parseEther(amount),
+      const tx = await buyWithBNB({
+        args: [],
+        value: parseEther(amount)
       })
+      console.log('BNB purchase transaction:', tx)
+      
       toast({
-        title: "Purchase Successful",
-        description: `Successfully purchased MORO tokens with ${amount} BNB!`,
+        title: "Transaction Submitted",
+        description: "Please wait for the transaction to be confirmed.",
       })
     } catch (error) {
       console.error('BNB purchase error:', error)
       toast({
         title: "Purchase Failed",
-        description: "Failed to purchase tokens. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to purchase tokens. Please try again.",
         variant: "destructive",
       })
     }
@@ -76,18 +81,20 @@ export const PurchaseToken = () => {
   const handlePurchaseWithUSDT = async () => {
     try {
       console.log('Attempting USDT purchase...')
-      await purchaseWithUSDT({
-        args: [parseEther(amount)],
+      const tx = await buyWithUSDT({
+        args: [parseEther(amount)]
       })
+      console.log('USDT purchase transaction:', tx)
+      
       toast({
-        title: "Purchase Successful",
-        description: `Successfully purchased MORO tokens with ${amount} USDT!`,
+        title: "Transaction Submitted",
+        description: "Please wait for the transaction to be confirmed.",
       })
     } catch (error) {
       console.error('USDT purchase error:', error)
       toast({
         title: "Purchase Failed",
-        description: "Failed to purchase tokens. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to purchase tokens. Please try again.",
         variant: "destructive",
       })
     }
