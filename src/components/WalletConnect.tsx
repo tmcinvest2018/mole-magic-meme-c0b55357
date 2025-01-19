@@ -3,12 +3,14 @@ import { Button } from './ui/button'
 import { useToast } from './ui/use-toast'
 import { supabase } from '@/integrations/supabase/client'
 import { LogOut } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 export const WalletConnect = () => {
   const { address, isConnected } = useAccount()
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
   const { toast } = useToast()
+  const navigate = useNavigate()
 
   const handleConnect = async () => {
     try {
@@ -28,6 +30,8 @@ export const WalletConnect = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
+    disconnect()
+    navigate('/login')
     toast({
       title: "Signed Out",
       description: "You have been successfully signed out.",
