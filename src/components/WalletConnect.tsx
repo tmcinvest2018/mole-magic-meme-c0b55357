@@ -2,7 +2,6 @@ import { useAccount, useConnect, useDisconnect, useChainId } from 'wagmi'
 import { Button } from './ui/button'
 import { useToast } from './ui/use-toast'
 import { bscTestnet } from 'wagmi/chains'
-import { w3mConnector } from '@web3modal/wagmi'
 
 export const WalletConnect = () => {
   const { address, isConnected } = useAccount()
@@ -10,14 +9,6 @@ export const WalletConnect = () => {
   const { disconnect } = useDisconnect()
   const chainId = useChainId()
   const { toast } = useToast()
-
-  // Find MetaMask and WalletConnect connectors
-  const metaMaskConnector = connectors.find(c => c.id === 'injected')
-  const walletConnectConnector = connectors.find(c => c.id === 'w3m') || 
-    w3mConnector({ 
-      projectId: 'YOUR_PROJECT_ID', // You'll need to get this from WalletConnect
-      chains: [bscTestnet],
-    })
 
   const handleConnect = async () => {
     try {
@@ -47,15 +38,11 @@ export const WalletConnect = () => {
         }
       }
 
-      // Try MetaMask first if available
-      if (window.ethereum && metaMaskConnector) {
-        console.log('MetaMask detected, connecting...')
-        await connect({ connector: metaMaskConnector })
-      } 
-      // Fallback to WalletConnect
-      else if (walletConnectConnector) {
-        console.log('Using WalletConnect as fallback...')
-        await connect({ connector: walletConnectConnector })
+      // Connect using the first available connector
+      const connector = connectors[0]
+      if (connector) {
+        console.log('Connecting with available connector...')
+        await connect({ connector })
       }
 
       toast({
