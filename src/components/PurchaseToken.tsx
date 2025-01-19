@@ -23,13 +23,13 @@ export const PurchaseToken = () => {
     address,
   })
 
-  const { writeAsync: buyWithBNB } = useContractWrite({
+  const { write: buyWithBNB } = useContractWrite({
     address: PRESALE_CONTRACT,
     abi: PRESALE_ABI,
     functionName: 'buyWithBNB',
   })
 
-  const { writeAsync: buyWithUSDT } = useContractWrite({
+  const { write: buyWithUSDT } = useContractWrite({
     address: PRESALE_CONTRACT,
     abi: PRESALE_ABI,
     functionName: 'buyWithUSDT',

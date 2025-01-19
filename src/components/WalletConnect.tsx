@@ -1,23 +1,21 @@
-import { useAccount, useConnect, useDisconnect, useChainId, useConfig } from 'wagmi'
+import { useAccount, useConnect, useDisconnect, useChainId } from 'wagmi'
 import { Button } from './ui/button'
 import { useToast } from './ui/use-toast'
 import { bscTestnet } from 'wagmi/chains'
-import { walletConnect } from '@web3modal/wagmi'
+import { w3mConnector } from '@web3modal/wagmi'
 
 export const WalletConnect = () => {
   const { address, isConnected } = useAccount()
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
   const chainId = useChainId()
-  const config = useConfig()
   const { toast } = useToast()
 
   // Find MetaMask and WalletConnect connectors
-  const metaMaskConnector = connectors.find(c => c.id === 'metaMask')
-  const walletConnectConnector = connectors.find(c => c.id === 'walletConnect') || 
-    walletConnect({ 
+  const metaMaskConnector = connectors.find(c => c.id === 'injected')
+  const walletConnectConnector = connectors.find(c => c.id === 'w3m') || 
+    w3mConnector({ 
       projectId: 'YOUR_PROJECT_ID', // You'll need to get this from WalletConnect
-      showQrModal: true,
       chains: [bscTestnet],
     })
 
@@ -29,8 +27,11 @@ export const WalletConnect = () => {
       if (chainId !== bscTestnet.id) {
         console.log('Wrong network detected, attempting to switch...')
         try {
-          // Use the wagmi config to switch networks
-          await config.switchChain?.(bscTestnet.id)
+          // Request network switch
+          await window.ethereum?.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: `0x${bscTestnet.id.toString(16)}` }],
+          })
           toast({
             title: "Network Switched",
             description: "Successfully switched to BSC Testnet",

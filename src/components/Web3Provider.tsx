@@ -2,7 +2,7 @@ import { WagmiConfig, createConfig } from 'wagmi'
 import { bscTestnet } from 'wagmi/chains'
 import { http } from 'viem'
 import { injected } from 'wagmi/connectors'
-import { walletConnect } from '@web3modal/wagmi'
+import { w3mConnector } from '@web3modal/wagmi'
 
 const config = createConfig({
   chains: [bscTestnet],
@@ -11,9 +11,8 @@ const config = createConfig({
   },
   connectors: [
     injected(),
-    walletConnect({ 
+    w3mConnector({ 
       projectId: 'YOUR_PROJECT_ID', // You'll need to get this from WalletConnect
-      showQrModal: true,
       chains: [bscTestnet],
     })
   ],
