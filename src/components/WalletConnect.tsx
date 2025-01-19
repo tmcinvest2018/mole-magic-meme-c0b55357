@@ -1,48 +1,63 @@
-import { useAccount, useConnect, useDisconnect, useChainId } from 'wagmi'
+import { useAccount, useConnect, useDisconnect, useNetwork, useSwitchNetwork } from 'wagmi'
 import { Button } from './ui/button'
 import { useToast } from './ui/use-toast'
 import { bscTestnet } from 'wagmi/chains'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 
 export const WalletConnect = () => {
   const { address, isConnected } = useAccount()
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
-  const chainId = useChainId()
+  const { chain } = useNetwork()
+  const { switchNetwork } = useSwitchNetwork()
   const { toast } = useToast()
+
+  // Find MetaMask and WalletConnect connectors
+  const metaMaskConnector = connectors.find(c => c.id === 'metaMask')
+  const walletConnectConnector = connectors.find(c => c.id === 'walletConnect') || 
+    new WalletConnectConnector({
+      chains: [bscTestnet],
+      options: {
+        projectId: 'YOUR_PROJECT_ID', // You'll need to get this from WalletConnect
+        showQrModal: true,
+      },
+    })
 
   const handleConnect = async () => {
     try {
       console.log('Attempting wallet connection...')
       
       // Check if we're on the correct network
-      if (chainId !== bscTestnet.id) {
+      if (chain && chain.id !== bscTestnet.id) {
         console.log('Wrong network detected, attempting to switch...')
-        try {
-          // Request network switch
-          await window.ethereum?.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: `0x${bscTestnet.id.toString(16)}` }],
-          })
-          toast({
-            title: "Network Switched",
-            description: "Successfully switched to BSC Testnet",
-          })
-        } catch (error) {
-          console.error('Network switch error:', error)
-          toast({
-            title: "Network Switch Failed",
-            description: "Failed to switch to BSC Testnet. Please switch manually.",
-            variant: "destructive",
-          })
-          return
+        if (switchNetwork) {
+          try {
+            await switchNetwork(bscTestnet.id)
+            toast({
+              title: "Network Switched",
+              description: "Successfully switched to BSC Testnet",
+            })
+          } catch (error) {
+            console.error('Network switch error:', error)
+            toast({
+              title: "Network Switch Failed",
+              description: "Failed to switch to BSC Testnet. Please switch manually.",
+              variant: "destructive",
+            })
+            return
+          }
         }
       }
 
-      // Connect using the first available connector
-      const connector = connectors[0]
-      if (connector) {
-        console.log('Connecting with available connector...')
-        await connect({ connector })
+      // Try MetaMask first if available
+      if (window.ethereum && metaMaskConnector) {
+        console.log('MetaMask detected, connecting...')
+        await connect({ connector: metaMaskConnector })
+      } 
+      // Fallback to WalletConnect
+      else if (walletConnectConnector) {
+        console.log('Using WalletConnect as fallback...')
+        await connect({ connector: walletConnectConnector })
       }
 
       toast({
