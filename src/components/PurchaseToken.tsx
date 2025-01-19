@@ -23,22 +23,22 @@ export const PurchaseToken = () => {
     address,
   })
 
-  const { write: buyWithBNB } = useContractWrite({
-    address: PRESALE_CONTRACT as `0x${string}`,
-    abi: PRESALE_ABI,
+  const { writeAsync: buyWithBNB } = useContractWrite({
     functionName: 'buyWithBNB',
+    abi: PRESALE_ABI,
+    address: PRESALE_CONTRACT as `0x${string}`,
   })
 
-  const { write: buyWithUSDT } = useContractWrite({
-    address: PRESALE_CONTRACT as `0x${string}`,
-    abi: PRESALE_ABI,
+  const { writeAsync: buyWithUSDT } = useContractWrite({
     functionName: 'buyWithUSDT',
+    abi: PRESALE_ABI,
+    address: PRESALE_CONTRACT as `0x${string}`,
   })
 
   const handlePurchaseWithBNB = async () => {
     try {
       console.log('Attempting BNB purchase...')
-      buyWithBNB?.({
+      await buyWithBNB?.({
         value: parseEther(amount)
       })
       
@@ -59,7 +59,7 @@ export const PurchaseToken = () => {
   const handlePurchaseWithUSDT = async () => {
     try {
       console.log('Attempting USDT purchase...')
-      buyWithUSDT?.({
+      await buyWithUSDT?.({
         args: [parseEther(amount)]
       })
       
