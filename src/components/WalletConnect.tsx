@@ -1,26 +1,24 @@
-import { useAccount, useConnect, useDisconnect, useNetwork, useSwitchNetwork } from 'wagmi'
+import { useAccount, useConnect, useDisconnect, useChainId, useConfig } from 'wagmi'
 import { Button } from './ui/button'
 import { useToast } from './ui/use-toast'
 import { bscTestnet } from 'wagmi/chains'
-import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
+import { walletConnect } from '@web3modal/wagmi'
 
 export const WalletConnect = () => {
   const { address, isConnected } = useAccount()
   const { connect, connectors } = useConnect()
   const { disconnect } = useDisconnect()
-  const { chain } = useNetwork()
-  const { switchNetwork } = useSwitchNetwork()
+  const chainId = useChainId()
+  const config = useConfig()
   const { toast } = useToast()
 
   // Find MetaMask and WalletConnect connectors
   const metaMaskConnector = connectors.find(c => c.id === 'metaMask')
   const walletConnectConnector = connectors.find(c => c.id === 'walletConnect') || 
-    new WalletConnectConnector({
+    walletConnect({ 
+      projectId: 'YOUR_PROJECT_ID', // You'll need to get this from WalletConnect
+      showQrModal: true,
       chains: [bscTestnet],
-      options: {
-        projectId: 'YOUR_PROJECT_ID', // You'll need to get this from WalletConnect
-        showQrModal: true,
-      },
     })
 
   const handleConnect = async () => {
@@ -28,24 +26,23 @@ export const WalletConnect = () => {
       console.log('Attempting wallet connection...')
       
       // Check if we're on the correct network
-      if (chain && chain.id !== bscTestnet.id) {
+      if (chainId !== bscTestnet.id) {
         console.log('Wrong network detected, attempting to switch...')
-        if (switchNetwork) {
-          try {
-            await switchNetwork(bscTestnet.id)
-            toast({
-              title: "Network Switched",
-              description: "Successfully switched to BSC Testnet",
-            })
-          } catch (error) {
-            console.error('Network switch error:', error)
-            toast({
-              title: "Network Switch Failed",
-              description: "Failed to switch to BSC Testnet. Please switch manually.",
-              variant: "destructive",
-            })
-            return
-          }
+        try {
+          // Use the wagmi config to switch networks
+          await config.switchChain?.(bscTestnet.id)
+          toast({
+            title: "Network Switched",
+            description: "Successfully switched to BSC Testnet",
+          })
+        } catch (error) {
+          console.error('Network switch error:', error)
+          toast({
+            title: "Network Switch Failed",
+            description: "Failed to switch to BSC Testnet. Please switch manually.",
+            variant: "destructive",
+          })
+          return
         }
       }
 
