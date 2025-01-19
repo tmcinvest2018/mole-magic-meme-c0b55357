@@ -1,6 +1,8 @@
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { Button } from './ui/button'
 import { useToast } from './ui/use-toast'
+import { supabase } from '@/integrations/supabase/client'
+import { LogOut } from 'lucide-react'
 
 export const WalletConnect = () => {
   const { address, isConnected } = useAccount()
@@ -24,12 +26,26 @@ export const WalletConnect = () => {
     }
   }
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    toast({
+      title: "Signed Out",
+      description: "You have been successfully signed out.",
+    })
+  }
+
   return (
-    <div>
+    <div className="flex gap-2">
       {isConnected ? (
-        <Button onClick={() => disconnect()}>
-          Disconnect {address?.slice(0, 6)}...{address?.slice(-4)}
-        </Button>
+        <>
+          <Button onClick={() => disconnect()} variant="outline">
+            Disconnect {address?.slice(0, 6)}...{address?.slice(-4)}
+          </Button>
+          <Button onClick={handleSignOut} variant="destructive">
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
+        </>
       ) : (
         <Button onClick={handleConnect}>Connect Wallet</Button>
       )}
