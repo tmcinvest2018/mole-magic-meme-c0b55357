@@ -1,7 +1,9 @@
 import { WagmiConfig, createConfig } from 'wagmi'
 import { bscTestnet } from 'wagmi/chains'
 import { http } from 'viem'
-import { injected } from 'wagmi/connectors'
+import { injected, walletConnect } from 'wagmi/connectors'
+
+const projectId = "YOUR_WALLETCONNECT_PROJECT_ID" // Replace with your actual WalletConnect project ID
 
 const config = createConfig({
   chains: [bscTestnet],
@@ -9,7 +11,8 @@ const config = createConfig({
     [bscTestnet.id]: http('https://data-seed-prebsc-1-s1.binance.org:8545'),
   },
   connectors: [
-    injected()
+    injected(),
+    walletConnect({ projectId })
   ],
 })
 
