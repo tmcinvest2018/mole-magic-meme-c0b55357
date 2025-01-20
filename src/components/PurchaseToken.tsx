@@ -5,7 +5,7 @@ import { bscTestnet } from 'viem/chains'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { useToast } from './ui/use-toast'
-import { PRESALE_CONTRACT, PRESALE_ABI, USDT_CONTRACT } from '@/config/contracts'
+import { MORO_TOKEN, PRESALE_CONTRACT, PRESALE_ABI, USDT_CONTRACT } from '@/config/contracts'
 
 export const PurchaseToken = () => {
   const [amount, setAmount] = useState('')
@@ -14,12 +14,10 @@ export const PurchaseToken = () => {
   const { toast } = useToast()
   const { writeContractAsync } = useWriteContract()
 
-  // Get BNB balance
   const { data: bnbBalance } = useBalance({
     address,
   })
 
-  // Get USDT balance
   const { data: usdtBalance } = useBalance({
     address,
     token: USDT_CONTRACT as `0x${string}`,
@@ -43,6 +41,8 @@ export const PurchaseToken = () => {
         abi: PRESALE_ABI,
         functionName: 'buyWithBNB',
         value: parseEther(amount),
+        chain: bscTestnet,
+        account: address,
       })
 
       toast({
@@ -89,6 +89,8 @@ export const PurchaseToken = () => {
         ],
         functionName: 'approve',
         args: [PRESALE_CONTRACT, parseEther(amount)],
+        chain: bscTestnet,
+        account: address,
       })
 
       // Then buy with USDT
@@ -97,6 +99,8 @@ export const PurchaseToken = () => {
         abi: PRESALE_ABI,
         functionName: 'buyWithUSDT',
         args: [parseEther(amount)],
+        chain: bscTestnet,
+        account: address,
       })
 
       toast({

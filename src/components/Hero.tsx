@@ -1,9 +1,13 @@
 import { motion } from "framer-motion";
 import { WalletConnect } from "./WalletConnect";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { PurchaseToken } from "./PurchaseToken";
 import { Dashboard } from "./Dashboard";
 
 export const Hero = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-orange-50 to-white">
       <Dashboard />
@@ -25,7 +29,16 @@ export const Hero = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <WalletConnect />
-            <PurchaseToken />
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+              <DialogTrigger asChild>
+                <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                  Buy Now
+                </button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <PurchaseToken />
+              </DialogContent>
+            </Dialog>
           </div>
         </motion.div>
         <motion.div
