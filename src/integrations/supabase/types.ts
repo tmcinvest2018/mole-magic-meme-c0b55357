@@ -9,13 +9,136 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      content_submissions: {
+        Row: {
+          content_type: string
+          content_url: string
+          created_at: string
+          id: string
+          points_awarded: number | null
+          status: string
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          content_type: string
+          content_url: string
+          created_at?: string
+          id?: string
+          points_awarded?: number | null
+          status?: string
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          content_type?: string
+          content_url?: string
+          created_at?: string
+          id?: string
+          points_awarded?: number | null
+          status?: string
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
+      referral_links: {
+        Row: {
+          created_at: string
+          id: string
+          referral_code: string
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referral_code: string
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referral_code?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
+      social_submissions: {
+        Row: {
+          created_at: string
+          id: string
+          platform: string
+          points_awarded: number | null
+          post_url: string
+          status: string
+          updated_at: string
+          wallet_address: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          platform: string
+          points_awarded?: number | null
+          post_url: string
+          status?: string
+          updated_at?: string
+          wallet_address: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          platform?: string
+          points_awarded?: number | null
+          post_url?: string
+          status?: string
+          updated_at?: string
+          wallet_address?: string
+        }
+        Relationships: []
+      }
+      xp_points: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          points: number
+          wallet_address: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          points?: number
+          wallet_address: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          points?: number
+          wallet_address?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      award_xp_points: {
+        Args: {
+          p_wallet_address: string
+          p_category: string
+          p_points: number
+        }
+        Returns: undefined
+      }
+      generate_referral_code: {
+        Args: {
+          wallet: string
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
