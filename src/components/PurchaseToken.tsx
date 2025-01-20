@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useContractWrite, useAccount, useBalance, useWriteContract } from 'wagmi'
+import { useContractWrite, useAccount, useBalance, useWriteContract, useChainId } from 'wagmi'
 import { parseEther } from 'viem'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -18,6 +18,7 @@ export const PurchaseToken = () => {
   const [amount, setAmount] = useState('')
   const { address } = useAccount()
   const { toast } = useToast()
+  const chainId = useChainId()
 
   const { data: balance } = useBalance({
     address,
@@ -33,7 +34,9 @@ export const PurchaseToken = () => {
         abi: PRESALE_ABI,
         address: PRESALE_CONTRACT as `0x${string}`,
         functionName: 'buyWithBNB',
-        value: parseEther(amount)
+        value: parseEther(amount),
+        chain: chainId,
+        account: address
       })
       
       toast({
@@ -57,7 +60,9 @@ export const PurchaseToken = () => {
         abi: PRESALE_ABI,
         address: PRESALE_CONTRACT as `0x${string}`,
         functionName: 'buyWithUSDT',
-        args: [parseEther(amount)]
+        args: [parseEther(amount)],
+        chain: chainId,
+        account: address
       })
       
       toast({
