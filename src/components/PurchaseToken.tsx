@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { useContractWrite, useAccount, useBalance, useWriteContract, useChainId, bscTestnet } from 'wagmi'
+import { useContractWrite, useAccount, useBalance, useWriteContract, useChainId } from 'wagmi'
 import { parseEther } from 'viem'
+import { bscTestnet } from 'viem/chains'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { useToast } from './ui/use-toast'
