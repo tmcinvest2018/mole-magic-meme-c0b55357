@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useContractWrite, useAccount, useBalance } from 'wagmi'
+import { useContractWrite, useAccount, useBalance, useWriteContract } from 'wagmi'
 import { parseEther } from 'viem'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
@@ -23,22 +23,16 @@ export const PurchaseToken = () => {
     address,
   })
 
-  const { write: buyWithBNB } = useContractWrite({
-    address: PRESALE_CONTRACT as `0x${string}`,
-    abi: PRESALE_ABI,
-    functionName: 'buyWithBNB',
-  })
-
-  const { write: buyWithUSDT } = useContractWrite({
-    address: PRESALE_CONTRACT as `0x${string}`,
-    abi: PRESALE_ABI,
-    functionName: 'buyWithUSDT',
-  })
+  const { writeContract: buyWithBNBContract } = useWriteContract()
+  const { writeContract: buyWithUSDTContract } = useWriteContract()
 
   const handlePurchaseWithBNB = async () => {
     try {
       console.log('Attempting BNB purchase...')
-      buyWithBNB?.({
+      buyWithBNBContract?.({
+        abi: PRESALE_ABI,
+        address: PRESALE_CONTRACT as `0x${string}`,
+        functionName: 'buyWithBNB',
         value: parseEther(amount)
       })
       
@@ -59,7 +53,10 @@ export const PurchaseToken = () => {
   const handlePurchaseWithUSDT = async () => {
     try {
       console.log('Attempting USDT purchase...')
-      buyWithUSDT?.({
+      buyWithUSDTContract?.({
+        abi: PRESALE_ABI,
+        address: PRESALE_CONTRACT as `0x${string}`,
+        functionName: 'buyWithUSDT',
         args: [parseEther(amount)]
       })
       
