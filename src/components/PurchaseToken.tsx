@@ -5,131 +5,133 @@ import { bscTestnet } from 'viem/chains'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { useToast } from './ui/use-toast'
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PRESALE_CONTRACT, PRESALE_ABI } from '@/config/contracts'
+import { PRESALE_CONTRACT, PRESALE_ABI, USDT_CONTRACT } from '@/config/contracts'
 
 export const PurchaseToken = () => {
   const [amount, setAmount] = useState('')
   const { address } = useAccount()
-  const { toast } = useToast()
   const chainId = useChainId()
+  const { toast } = useToast()
+  const { writeContractAsync } = useWriteContract()
 
-  const { data: balance } = useBalance({
+  // Get BNB balance
+  const { data: bnbBalance } = useBalance({
     address,
   })
 
-  const { writeContract: buyWithBNBContract } = useWriteContract()
-  const { writeContract: buyWithUSDTContract } = useWriteContract()
+  // Get USDT balance
+  const { data: usdtBalance } = useBalance({
+    address,
+    token: USDT_CONTRACT as `0x${string}`,
+  })
 
-  const handlePurchaseWithBNB = async () => {
+  const handleBuyWithBNB = async () => {
+    if (!amount || !address) return
+
     try {
-      console.log('Attempting BNB purchase...')
-      buyWithBNBContract?.({
-        abi: PRESALE_ABI,
+      if (chainId !== bscTestnet.id) {
+        toast({
+          title: "Wrong Network",
+          description: "Please switch to BSC Testnet",
+          variant: "destructive",
+        })
+        return
+      }
+
+      await writeContractAsync({
         address: PRESALE_CONTRACT as `0x${string}`,
+        abi: PRESALE_ABI,
         functionName: 'buyWithBNB',
         value: parseEther(amount),
-        chain: bscTestnet,
-        account: address
       })
-      
+
       toast({
-        title: "Transaction Submitted",
-        description: "Please wait for the transaction to be confirmed.",
+        title: "Purchase Successful",
+        description: "You have successfully purchased MORO tokens with BNB",
       })
     } catch (error) {
-      console.error('BNB purchase error:', error)
+      console.error('Error buying with BNB:', error)
       toast({
         title: "Purchase Failed",
-        description: error instanceof Error ? error.message : "Failed to purchase tokens. Please try again.",
+        description: "Failed to purchase tokens. Please try again.",
         variant: "destructive",
       })
     }
   }
 
-  const handlePurchaseWithUSDT = async () => {
+  const handleBuyWithUSDT = async () => {
+    if (!amount || !address) return
+
     try {
-      console.log('Attempting USDT purchase...')
-      buyWithUSDTContract?.({
-        abi: PRESALE_ABI,
+      if (chainId !== bscTestnet.id) {
+        toast({
+          title: "Wrong Network",
+          description: "Please switch to BSC Testnet",
+          variant: "destructive",
+        })
+        return
+      }
+
+      // First approve USDT spending
+      await writeContractAsync({
+        address: USDT_CONTRACT as `0x${string}`,
+        abi: [
+          {
+            inputs: [
+              { name: "spender", type: "address" },
+              { name: "amount", type: "uint256" },
+            ],
+            name: "approve",
+            outputs: [{ name: "", type: "bool" }],
+            stateMutability: "nonpayable",
+            type: "function",
+          },
+        ],
+        functionName: 'approve',
+        args: [PRESALE_CONTRACT, parseEther(amount)],
+      })
+
+      // Then buy with USDT
+      await writeContractAsync({
         address: PRESALE_CONTRACT as `0x${string}`,
+        abi: PRESALE_ABI,
         functionName: 'buyWithUSDT',
         args: [parseEther(amount)],
-        chain: bscTestnet,
-        account: address
       })
-      
+
       toast({
-        title: "Transaction Submitted",
-        description: "Please wait for the transaction to be confirmed.",
+        title: "Purchase Successful",
+        description: "You have successfully purchased MORO tokens with USDT",
       })
     } catch (error) {
-      console.error('USDT purchase error:', error)
+      console.error('Error buying with USDT:', error)
       toast({
         title: "Purchase Failed",
-        description: error instanceof Error ? error.message : "Failed to purchase tokens. Please try again.",
+        description: "Failed to purchase tokens. Please try again.",
         variant: "destructive",
       })
     }
   }
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button disabled={!address}>Buy MORO</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Purchase MORO Tokens</DialogTitle>
-        </DialogHeader>
-        <Tabs defaultValue="bnb" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="bnb">Buy with BNB</TabsTrigger>
-            <TabsTrigger value="usdt">Buy with USDT</TabsTrigger>
-          </TabsList>
-          <TabsContent value="bnb" className="space-y-4">
-            <div className="space-y-4">
-              <Input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Amount of BNB"
-              />
-              <Button 
-                onClick={handlePurchaseWithBNB} 
-                className="w-full"
-                disabled={!address || !amount}
-              >
-                Purchase with BNB
-              </Button>
-            </div>
-          </TabsContent>
-          <TabsContent value="usdt" className="space-y-4">
-            <div className="space-y-4">
-              <Input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Amount of USDT"
-              />
-              <Button 
-                onClick={handlePurchaseWithUSDT}
-                className="w-full"
-                disabled={!address || !amount}
-              >
-                Purchase with USDT
-              </Button>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-    </Dialog>
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Input
+          type="number"
+          placeholder="Amount"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+        />
+        <div className="text-sm text-gray-500">
+          Your BNB Balance: {bnbBalance?.formatted || '0'} BNB
+          <br />
+          Your USDT Balance: {usdtBalance?.formatted || '0'} USDT
+        </div>
+      </div>
+      <div className="space-x-4">
+        <Button onClick={handleBuyWithBNB}>Buy with BNB</Button>
+        <Button onClick={handleBuyWithUSDT}>Buy with USDT</Button>
+      </div>
+    </div>
   )
 }
