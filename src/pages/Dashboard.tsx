@@ -11,30 +11,46 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useToast } from "@/components/ui/use-toast"
 
 const Dashboard = () => {
   const { address } = useAccount()
+  const { toast } = useToast()
 
   const { data: xpPoints, isLoading, error } = useQuery({
     queryKey: ['xp-points', address],
     queryFn: async () => {
       console.log('Fetching XP points for address:', address)
+      if (!address) {
+        console.error('No wallet address provided')
+        throw new Error('Wallet address is required')
+      }
+
       try {
-        const { data, error } = await supabase
+        const { data, error: supabaseError } = await supabase
           .from('xp_points')
           .select('*')
           .eq('wallet_address', address)
-          .throwOnError()
-        
-        if (error) {
-          console.error('Error fetching XP points:', error)
-          throw error
+
+        if (supabaseError) {
+          console.error('Supabase error:', supabaseError)
+          toast({
+            variant: "destructive",
+            title: "Error fetching XP points",
+            description: supabaseError.message
+          })
+          throw supabaseError
         }
-        
+
         console.log('XP points data:', data)
         return data || []
       } catch (err) {
         console.error('Error in XP points query:', err)
+        toast({
+          variant: "destructive",
+          title: "Error loading dashboard data",
+          description: "Please try again later"
+        })
         throw err
       }
     },
