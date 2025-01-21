@@ -5,7 +5,11 @@ import { MORO_TOKEN, PRESALE_CONTRACT, PRESALE_ABI } from '@/config/contracts'
 import { useNavigate } from 'react-router-dom'
 import { Button } from './ui/button'
 
-export const Dashboard = () => {
+interface DashboardProps {
+  hideViewDashboardButton?: boolean;
+}
+
+export const Dashboard = ({ hideViewDashboardButton = false }: DashboardProps) => {
   const { address } = useAccount()
   const navigate = useNavigate()
 
@@ -28,7 +32,7 @@ export const Dashboard = () => {
   if (!address) return null
 
   return (
-    <div className="fixed top-4 right-4 z-50">
+    <div className={hideViewDashboardButton ? "" : "fixed top-4 right-4 z-50"}>
       <Card className="w-[300px] bg-gradient-to-b from-orange-50 to-white border border-orange-200 shadow-lg">
         <CardHeader className="space-y-1 pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2 text-orange-600">
@@ -58,14 +62,16 @@ export const Dashboard = () => {
             </span>
             <span className="font-medium text-gray-900">{purchasedAmount ? Number(purchasedAmount) : '0'} MORO</span>
           </div>
-          <Button 
-            variant="outline" 
-            className="w-full mt-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 border-none shadow-md"
-            onClick={() => navigate('/dashboard')}
-          >
-            View Full Dashboard
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          {!hideViewDashboardButton && (
+            <Button 
+              variant="outline" 
+              className="w-full mt-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 border-none shadow-md"
+              onClick={() => navigate('/dashboard')}
+            >
+              View Full Dashboard
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useToast } from "@/components/ui/use-toast"
+import { Dashboard as WalletDashboard } from '@/components/Dashboard'
 
 const Dashboard = () => {
   const { address } = useAccount()
@@ -75,62 +76,69 @@ const Dashboard = () => {
     )
   }
 
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-orange-50 to-white">
-        <p className="text-lg text-red-600">Error loading dashboard data. Please try again later.</p>
-      </div>
-    )
-  }
-
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen bg-gradient-to-b from-orange-50 to-white">
+    <div className="container mx-auto px-4 py-8 min-h-screen bg-gradient-to-b from-orange-50 to-white space-y-8">
       <h1 className="text-3xl font-bold mb-8 text-orange-600">Your Dashboard</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {xpPoints && xpPoints.length > 0 ? (
-          xpPoints.map((xp) => (
-            <Card key={xp.id} className="bg-white shadow-lg border border-orange-200">
-              <CardHeader>
-                <CardTitle className="capitalize text-orange-600">{xp.category} XP</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-3xl font-bold text-primary">{xp.points}</p>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <p className="col-span-3 text-center text-gray-600">No XP points found. Start earning points by participating in our community!</p>
-        )}
-      </div>
-
-      {xpPoints && xpPoints.length > 0 && (
+      {/* Wallet Dashboard Section */}
+      <section className="mb-12">
         <Card className="bg-white shadow-lg border border-orange-200">
           <CardHeader>
-            <CardTitle className="text-orange-600">XP History</CardTitle>
+            <CardTitle className="text-orange-600">Wallet Overview</CardTitle>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Points</TableHead>
-                  <TableHead>Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {xpPoints.map((xp) => (
-                  <TableRow key={xp.id}>
-                    <TableCell className="capitalize">{xp.category}</TableCell>
-                    <TableCell>{xp.points}</TableCell>
-                    <TableCell>{new Date(xp.created_at).toLocaleDateString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <WalletDashboard hideViewDashboardButton={true} />
           </CardContent>
         </Card>
-      )}
+      </section>
+
+      {/* XP Points Section */}
+      <section>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {xpPoints && xpPoints.length > 0 ? (
+            xpPoints.map((xp) => (
+              <Card key={xp.id} className="bg-white shadow-lg border border-orange-200">
+                <CardHeader>
+                  <CardTitle className="capitalize text-orange-600">{xp.category} XP</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-3xl font-bold text-primary">{xp.points}</p>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <p className="col-span-3 text-center text-gray-600">No XP points found. Start earning points by participating in our community!</p>
+          )}
+        </div>
+
+        {xpPoints && xpPoints.length > 0 && (
+          <Card className="bg-white shadow-lg border border-orange-200">
+            <CardHeader>
+              <CardTitle className="text-orange-600">XP History</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Points</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {xpPoints.map((xp) => (
+                    <TableRow key={xp.id}>
+                      <TableCell className="capitalize">{xp.category}</TableCell>
+                      <TableCell>{xp.points}</TableCell>
+                      <TableCell>{new Date(xp.created_at).toLocaleDateString()}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+      </section>
     </div>
   )
 }
