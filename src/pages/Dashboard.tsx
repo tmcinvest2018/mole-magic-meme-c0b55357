@@ -2,7 +2,7 @@ import { useAccount } from 'wagmi'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '@/integrations/supabase/client'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Award, FileText, Link, MessageSquare } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -13,52 +13,229 @@ import {
 } from "@/components/ui/table"
 import { useToast } from "@/components/ui/use-toast"
 import { Dashboard as WalletDashboard } from '@/components/Dashboard'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useState } from "react"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+
+// Form validation schemas
+const contentSubmissionSchema = z.object({
+  content_type: z.string().min(1, "Content type is required"),
+  content_url: z.string().url("Please enter a valid URL"),
+})
+
+const socialSubmissionSchema = z.object({
+  platform: z.string().min(1, "Platform is required"),
+  post_url: z.string().url("Please enter a valid URL"),
+})
 
 const Dashboard = () => {
   const { address } = useAccount()
   const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { data: xpPoints, isLoading, error } = useQuery({
+  // Forms
+  const contentForm = useForm({
+    resolver: zodResolver(contentSubmissionSchema),
+    defaultValues: {
+      content_type: "",
+      content_url: "",
+    },
+  })
+
+  const socialForm = useForm({
+    resolver: zodResolver(socialSubmissionSchema),
+    defaultValues: {
+      platform: "",
+      post_url: "",
+    },
+  })
+
+  // Fetch XP points
+  const { data: xpPoints, isLoading: isLoadingXP, refetch: refetchXP } = useQuery({
     queryKey: ['xp-points', address],
     queryFn: async () => {
       console.log('Fetching XP points for address:', address)
-      if (!address) {
-        console.error('No wallet address provided')
-        throw new Error('Wallet address is required')
-      }
+      if (!address) throw new Error('Wallet address is required')
 
-      try {
-        const { data, error: supabaseError } = await supabase
-          .from('xp_points')
-          .select('*')
-          .eq('wallet_address', address)
+      const { data, error } = await supabase
+        .from('xp_points')
+        .select('*')
+        .eq('wallet_address', address)
 
-        if (supabaseError) {
-          console.error('Supabase error:', supabaseError)
-          toast({
-            variant: "destructive",
-            title: "Error fetching XP points",
-            description: supabaseError.message
-          })
-          throw supabaseError
-        }
-
-        console.log('XP points data:', data)
-        return data || []
-      } catch (err) {
-        console.error('Error in XP points query:', err)
+      if (error) {
+        console.error('Error fetching XP points:', error)
         toast({
           variant: "destructive",
-          title: "Error loading dashboard data",
-          description: "Please try again later"
+          title: "Error fetching XP points",
+          description: error.message
         })
-        throw err
+        throw error
       }
+
+      return data || []
     },
     enabled: !!address,
-    retry: 3,
-    retryDelay: 1000,
   })
+
+  // Fetch submissions
+  const { data: contentSubmissions, isLoading: isLoadingContent, refetch: refetchContent } = useQuery({
+    queryKey: ['content-submissions', address],
+    queryFn: async () => {
+      if (!address) throw new Error('Wallet address is required')
+
+      const { data, error } = await supabase
+        .from('content_submissions')
+        .select('*')
+        .eq('wallet_address', address)
+
+      if (error) throw error
+      return data || []
+    },
+    enabled: !!address,
+  })
+
+  const { data: socialSubmissions, isLoading: isLoadingSocial, refetch: refetchSocial } = useQuery({
+    queryKey: ['social-submissions', address],
+    queryFn: async () => {
+      if (!address) throw new Error('Wallet address is required')
+
+      const { data, error } = await supabase
+        .from('social_submissions')
+        .select('*')
+        .eq('wallet_address', address)
+
+      if (error) throw error
+      return data || []
+    },
+    enabled: !!address,
+  })
+
+  const { data: referralLink, isLoading: isLoadingReferral } = useQuery({
+    queryKey: ['referral-link', address],
+    queryFn: async () => {
+      if (!address) throw new Error('Wallet address is required')
+
+      const { data, error } = await supabase
+        .from('referral_links')
+        .select('*')
+        .eq('wallet_address', address)
+        .single()
+
+      if (error && error.code !== 'PGRST116') throw error
+      return data
+    },
+    enabled: !!address,
+  })
+
+  // Submit handlers
+  const handleContentSubmit = async (values: z.infer<typeof contentSubmissionSchema>) => {
+    try {
+      setIsSubmitting(true)
+      const { error } = await supabase
+        .from('content_submissions')
+        .insert([
+          {
+            wallet_address: address,
+            ...values
+          }
+        ])
+
+      if (error) throw error
+
+      toast({
+        title: "Content submitted successfully",
+        description: "Your submission is being reviewed.",
+      })
+      
+      contentForm.reset()
+      refetchContent()
+      refetchXP()
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error submitting content",
+        description: error.message
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleSocialSubmit = async (values: z.infer<typeof socialSubmissionSchema>) => {
+    try {
+      setIsSubmitting(true)
+      const { error } = await supabase
+        .from('social_submissions')
+        .insert([
+          {
+            wallet_address: address,
+            ...values
+          }
+        ])
+
+      if (error) throw error
+
+      toast({
+        title: "Social post submitted successfully",
+        description: "Your submission is being reviewed.",
+      })
+      
+      socialForm.reset()
+      refetchSocial()
+      refetchXP()
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error submitting social post",
+        description: error.message
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const generateReferralLink = async () => {
+    try {
+      setIsSubmitting(true)
+      if (!address) throw new Error('Wallet address is required')
+
+      const { data: referralCode, error: functionError } = await supabase
+        .rpc('generate_referral_code', {
+          wallet: address
+        })
+
+      if (functionError) throw functionError
+
+      const { error: insertError } = await supabase
+        .from('referral_links')
+        .insert([
+          {
+            wallet_address: address,
+            referral_code: referralCode
+          }
+        ])
+
+      if (insertError) throw insertError
+
+      toast({
+        title: "Referral link generated",
+        description: "Your unique referral code has been created.",
+      })
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Error generating referral link",
+        description: error.message
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   if (!address) {
     return (
@@ -67,6 +244,8 @@ const Dashboard = () => {
       </div>
     )
   }
+
+  const isLoading = isLoadingXP || isLoadingContent || isLoadingSocial || isLoadingReferral
 
   if (isLoading) {
     return (
@@ -92,52 +271,248 @@ const Dashboard = () => {
         </Card>
       </section>
 
-      {/* XP Points Section */}
-      <section>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {xpPoints && xpPoints.length > 0 ? (
-            xpPoints.map((xp) => (
-              <Card key={xp.id} className="bg-white shadow-lg border border-orange-200">
-                <CardHeader>
-                  <CardTitle className="capitalize text-orange-600">{xp.category} XP</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-3xl font-bold text-primary">{xp.points}</p>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <p className="col-span-3 text-center text-gray-600">No XP points found. Start earning points by participating in our community!</p>
-          )}
-        </div>
+      {/* XP Overview Section */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="bg-white shadow-lg border border-orange-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Content XP</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {xpPoints?.find(xp => xp.category === 'content')?.points || 0}
+            </div>
+          </CardContent>
+        </Card>
 
-        {xpPoints && xpPoints.length > 0 && (
-          <Card className="bg-white shadow-lg border border-orange-200">
-            <CardHeader>
-              <CardTitle className="text-orange-600">XP History</CardTitle>
-            </CardHeader>
-            <CardContent>
+        <Card className="bg-white shadow-lg border border-orange-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Social XP</CardTitle>
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {xpPoints?.find(xp => xp.category === 'social')?.points || 0}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white shadow-lg border border-orange-200">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Referral XP</CardTitle>
+            <Link className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {xpPoints?.find(xp => xp.category === 'referral')?.points || 0}
+            </div>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Submission Forms Section */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Content Submission Form */}
+        <Card className="bg-white shadow-lg border border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-orange-600">Submit Content</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...contentForm}>
+              <form onSubmit={contentForm.handleSubmit(handleContentSubmit)} className="space-y-4">
+                <FormField
+                  control={contentForm.control}
+                  name="content_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content Type</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., article, video" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={contentForm.control}
+                  name="content_url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Content URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting
+                    </>
+                  ) : (
+                    'Submit Content'
+                  )}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+
+        {/* Social Submission Form */}
+        <Card className="bg-white shadow-lg border border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-orange-600">Submit Social Post</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Form {...socialForm}>
+              <form onSubmit={socialForm.handleSubmit(handleSocialSubmit)} className="space-y-4">
+                <FormField
+                  control={socialForm.control}
+                  name="platform"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Platform</FormLabel>
+                      <FormControl>
+                        <Input placeholder="e.g., Twitter, LinkedIn" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={socialForm.control}
+                  name="post_url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Post URL</FormLabel>
+                      <FormControl>
+                        <Input placeholder="https://" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting
+                    </>
+                  ) : (
+                    'Submit Post'
+                  )}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Referral Section */}
+      <section className="mb-8">
+        <Card className="bg-white shadow-lg border border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-orange-600">Referral Program</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {referralLink ? (
+              <div className="space-y-4">
+                <div>
+                  <Label>Your Referral Code</Label>
+                  <div className="mt-1 p-3 bg-gray-50 rounded-md border">
+                    {referralLink.referral_code}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Button
+                onClick={generateReferralLink}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating
+                  </>
+                ) : (
+                  'Generate Referral Link'
+                )}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Submissions History */}
+      <section className="space-y-6">
+        {/* Content Submissions */}
+        <Card className="bg-white shadow-lg border border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-orange-600">Content Submissions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {contentSubmissions && contentSubmissions.length > 0 ? (
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Category</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>URL</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Points</TableHead>
-                    <TableHead>Date</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {xpPoints.map((xp) => (
-                    <TableRow key={xp.id}>
-                      <TableCell className="capitalize">{xp.category}</TableCell>
-                      <TableCell>{xp.points}</TableCell>
-                      <TableCell>{new Date(xp.created_at).toLocaleDateString()}</TableCell>
+                  {contentSubmissions.map((submission) => (
+                    <TableRow key={submission.id}>
+                      <TableCell>{submission.content_type}</TableCell>
+                      <TableCell className="max-w-xs truncate">{submission.content_url}</TableCell>
+                      <TableCell>{submission.status}</TableCell>
+                      <TableCell>{submission.points_awarded || '-'}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
-        )}
+            ) : (
+              <p className="text-muted-foreground">No content submissions yet.</p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Social Submissions */}
+        <Card className="bg-white shadow-lg border border-orange-200">
+          <CardHeader>
+            <CardTitle className="text-orange-600">Social Submissions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {socialSubmissions && socialSubmissions.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Platform</TableHead>
+                    <TableHead>URL</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Points</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {socialSubmissions.map((submission) => (
+                    <TableRow key={submission.id}>
+                      <TableCell>{submission.platform}</TableCell>
+                      <TableCell className="max-w-xs truncate">{submission.post_url}</TableCell>
+                      <TableCell>{submission.status}</TableCell>
+                      <TableCell>{submission.points_awarded || '-'}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-muted-foreground">No social submissions yet.</p>
+            )}
+          </CardContent>
+        </Card>
       </section>
     </div>
   )
