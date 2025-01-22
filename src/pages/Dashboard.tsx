@@ -130,15 +130,19 @@ const Dashboard = () => {
   const { data: referralLink, isLoading: isLoadingReferral } = useQuery({
     queryKey: ['referral-link', address],
     queryFn: async () => {
+      console.log('Fetching referral link for address:', address)
       if (!address) throw new Error('Wallet address is required')
 
       const { data, error } = await supabase
         .from('referral_links')
         .select('*')
         .eq('wallet_address', address)
-        .single()
+        .maybeSingle()
 
-      if (error && error.code !== 'PGRST116') throw error
+      if (error) {
+        console.error('Error fetching referral link:', error)
+        throw error
+      }
       return data
     },
     enabled: !!address,
@@ -186,6 +190,7 @@ const Dashboard = () => {
       setIsSubmitting(true)
       if (!address) throw new Error('Wallet address is required')
 
+      console.log('Submitting social post for address:', address)
       const submission: SocialSubmission = {
         wallet_address: address,
         platform: values.platform,
@@ -196,7 +201,10 @@ const Dashboard = () => {
         .from('social_submissions')
         .insert([submission])
 
-      if (error) throw error
+      if (error) {
+        console.error('Error submitting social post:', error)
+        throw error
+      }
 
       toast({
         title: "Social post submitted successfully",
@@ -204,9 +212,10 @@ const Dashboard = () => {
       })
       
       socialForm.reset()
-      refetchSocial()
-      refetchXP()
+      await refetchSocial()
+      await refetchXP()
     } catch (error: any) {
+      console.error('Social submission error:', error)
       toast({
         variant: "destructive",
         title: "Error submitting social post",
