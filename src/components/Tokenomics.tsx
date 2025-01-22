@@ -10,9 +10,9 @@ const tokenomics = [
   },
   {
     icon: <RefreshCw className="w-6 h-6" />,
-    title: "Redistribution",
+    title: "Rewards",
     value: "1%",
-    description: "Redistributed to holders",
+    description: "Distributed to racers",
   },
   {
     icon: <Lock className="w-6 h-6" />,
@@ -24,23 +24,23 @@ const tokenomics = [
     icon: <Megaphone className="w-6 h-6" />,
     title: "Marketing",
     value: "3%",
-    description: "Reserved for growth",
+    description: "For growth & development",
   },
 ];
 
 export const Tokenomics = () => {
   return (
-    <section className="py-20 bg-gradient-to-b from-white to-orange-50">
+    <section className="py-20 bg-gradient-to-b from-white to-[#F2F2F2]">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-orange-100 text-primary rounded-full">
+          <span className="inline-block px-4 py-1 mb-4 text-sm font-medium bg-primary/10 text-primary rounded-full">
             Tokenomics
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Transparent, Fair, and Sustainable
+            Transparent, Fair, and High-Performance
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Total Supply: 1,000,000,000 MORO
+            Total Supply: 1,000,000,000 DGP
           </p>
         </div>
 
@@ -71,7 +71,7 @@ export const Tokenomics = () => {
         >
           <img
             src="/lovable-uploads/d72d77da-e5f1-4be8-af84-1bd13e62eb52.png"
-            alt="Morocco Mole Trading"
+            alt="Degen Grand Prix Trading"
             className="max-w-2xl mx-auto rounded-2xl shadow-2xl"
           />
         </motion.div>

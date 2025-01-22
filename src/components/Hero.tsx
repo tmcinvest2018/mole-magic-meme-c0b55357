@@ -9,7 +9,7 @@ export const Hero = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-orange-50 to-white">
+    <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-b from-[#F2F2F2] to-white">
       <Dashboard />
       <div className="container mx-auto px-4 py-16 relative z-10">
         <motion.div
@@ -18,21 +18,21 @@ export const Hero = () => {
           transition={{ duration: 0.8 }}
           className="text-center"
         >
-          <span className="inline-block px-4 py-1 mb-6 text-sm font-medium bg-orange-100 text-primary rounded-full animate-shine">
-            Welcome to the Future of Meme Coins
+          <span className="inline-block px-4 py-1 mb-6 text-sm font-medium bg-primary/10 text-primary rounded-full animate-shine">
+            Welcome to the Future of Racing and Gaming
           </span>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-            Unleashing the Power of the Mole
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent">
+            Start Your Engines: Join the Degen Grand Prix!
           </h1>
           <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join the crypto underground revolution with Morocco Mole Meme Coin. A token for the community, by the community.
+            Accelerate into the crypto revolution with Degen Grand Prix. A blockchain game and token for racers, by racers.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <WalletConnect />
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
               <DialogTrigger asChild>
                 <button className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                  Buy Now
+                  Buy DGP
                 </button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
@@ -49,7 +49,7 @@ export const Hero = () => {
         >
           <img
             src="/lovable-uploads/d41e23b1-c327-4449-9931-7b26ef8b0430.png"
-            alt="Morocco Mole"
+            alt="Degen Grand Prix"
             className="w-full h-auto rounded-2xl shadow-2xl"
           />
         </motion.div>
