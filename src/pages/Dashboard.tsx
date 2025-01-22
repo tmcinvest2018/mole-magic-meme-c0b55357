@@ -33,13 +33,25 @@ const socialSubmissionSchema = z.object({
   post_url: z.string().url("Please enter a valid URL"),
 })
 
+type ContentSubmission = {
+  content_type: string;
+  content_url: string;
+  wallet_address: string;
+}
+
+type SocialSubmission = {
+  platform: string;
+  post_url: string;
+  wallet_address: string;
+}
+
 const Dashboard = () => {
   const { address } = useAccount()
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Forms
-  const contentForm = useForm({
+  const contentForm = useForm<z.infer<typeof contentSubmissionSchema>>({
     resolver: zodResolver(contentSubmissionSchema),
     defaultValues: {
       content_type: "",
@@ -47,7 +59,7 @@ const Dashboard = () => {
     },
   })
 
-  const socialForm = useForm({
+  const socialForm = useForm<z.infer<typeof socialSubmissionSchema>>({
     resolver: zodResolver(socialSubmissionSchema),
     defaultValues: {
       platform: "",
@@ -136,14 +148,17 @@ const Dashboard = () => {
   const handleContentSubmit = async (values: z.infer<typeof contentSubmissionSchema>) => {
     try {
       setIsSubmitting(true)
+      if (!address) throw new Error('Wallet address is required')
+
+      const submission: ContentSubmission = {
+        wallet_address: address,
+        content_type: values.content_type,
+        content_url: values.content_url,
+      }
+
       const { error } = await supabase
         .from('content_submissions')
-        .insert([
-          {
-            wallet_address: address,
-            ...values
-          }
-        ])
+        .insert([submission])
 
       if (error) throw error
 
@@ -169,14 +184,17 @@ const Dashboard = () => {
   const handleSocialSubmit = async (values: z.infer<typeof socialSubmissionSchema>) => {
     try {
       setIsSubmitting(true)
+      if (!address) throw new Error('Wallet address is required')
+
+      const submission: SocialSubmission = {
+        wallet_address: address,
+        platform: values.platform,
+        post_url: values.post_url,
+      }
+
       const { error } = await supabase
         .from('social_submissions')
-        .insert([
-          {
-            wallet_address: address,
-            ...values
-          }
-        ])
+        .insert([submission])
 
       if (error) throw error
 
