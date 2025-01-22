@@ -33,39 +33,39 @@ export const Dashboard = ({ hideViewDashboardButton = false }: DashboardProps) =
 
   return (
     <div className={hideViewDashboardButton ? "" : "fixed top-4 right-4 z-50"}>
-      <Card className="w-[300px] bg-gradient-to-b from-orange-50 to-white border border-orange-200 shadow-lg">
+      <Card className="w-[300px] bg-gradient-to-br from-primary via-primary/90 to-primary/80 border-none shadow-xl">
         <CardHeader className="space-y-1 pb-2">
-          <CardTitle className="text-sm font-medium flex items-center gap-2 text-orange-600">
+          <CardTitle className="text-sm font-medium flex items-center gap-2 text-white">
             <Wallet className="w-4 h-4" />
             {address.slice(0, 6)}...{address.slice(-4)}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2 text-gray-600">
-              <Coins className="w-4 h-4 text-primary" />
+            <span className="flex items-center gap-2 text-white/80">
+              <Coins className="w-4 h-4 text-secondary" />
               BNB Balance
             </span>
-            <span className="font-medium text-gray-900">{bnbBalance?.formatted.slice(0, 6)} BNB</span>
+            <span className="font-medium text-white">{bnbBalance?.formatted.slice(0, 6)} BNB</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2 text-gray-600">
+            <span className="flex items-center gap-2 text-white/80">
               <Coins className="w-4 h-4 text-secondary" />
-              MORO Balance
+              DGP Balance
             </span>
-            <span className="font-medium text-gray-900">{moroBalance?.formatted || '0'} MORO</span>
+            <span className="font-medium text-white">{moroBalance?.formatted || '0'} DGP</span>
           </div>
           <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2 text-gray-600">
-              <Coins className="w-4 h-4 text-accent" />
+            <span className="flex items-center gap-2 text-white/80">
+              <Coins className="w-4 h-4 text-secondary" />
               Purchased
             </span>
-            <span className="font-medium text-gray-900">{purchasedAmount ? Number(purchasedAmount) : '0'} MORO</span>
+            <span className="font-medium text-white">{purchasedAmount ? Number(purchasedAmount) : '0'} DGP</span>
           </div>
           {!hideViewDashboardButton && (
             <Button 
-              variant="outline" 
-              className="w-full mt-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 border-none shadow-md"
+              variant="secondary"
+              className="w-full mt-2 bg-white text-primary hover:bg-white/90 border-none shadow-md font-semibold"
               onClick={() => navigate('/dashboard')}
             >
               View Full Dashboard
