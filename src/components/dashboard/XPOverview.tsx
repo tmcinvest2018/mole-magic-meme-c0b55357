@@ -1,20 +1,12 @@
 /**
  * XPOverview Component
  * 
- * Displays user's XP points across different categories in a grid of cards.
- * 
- * Props:
- * - xpPoints: Array of XP point records from the database
+ * Displays user's XP points across different categories.
  * 
  * Styling:
- * - Grid layout with responsive columns
- * - White background cards with orange border
- * - Icon and text styling for clear hierarchy
- * 
- * To modify:
- * - Adjust grid columns by updating grid-cols-* classes
- * - Change card styling via bg-white and border-orange-200 classes
- * - Modify spacing with gap-6 class
+ * - Clean card design with primary color accents
+ * - Consistent typography and spacing
+ * - Responsive grid layout
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -35,37 +27,37 @@ export const XPOverview = ({ xpPoints }: XPOverviewProps) => {
 
   return (
     <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <Card className="bg-white shadow-lg border border-orange-200">
+      <Card className="bg-white shadow-lg border border-primary/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Content XP</CardTitle>
-          <FileText className="h-4 w-4 text-muted-foreground" />
+          <FileText className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className="text-2xl font-bold text-accent">
             {getXPByCategory('content')}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white shadow-lg border border-orange-200">
+      <Card className="bg-white shadow-lg border border-primary/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Social XP</CardTitle>
-          <MessageSquare className="h-4 w-4 text-muted-foreground" />
+          <MessageSquare className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className="text-2xl font-bold text-accent">
             {getXPByCategory('social')}
           </div>
         </CardContent>
       </Card>
 
-      <Card className="bg-white shadow-lg border border-orange-200">
+      <Card className="bg-white shadow-lg border border-primary/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Referral XP</CardTitle>
-          <Link className="h-4 w-4 text-muted-foreground" />
+          <Link className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
+          <div className="text-2xl font-bold text-accent">
             {getXPByCategory('referral')}
           </div>
         </CardContent>

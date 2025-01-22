@@ -3,19 +3,10 @@
  * 
  * Handles referral code generation and display.
  * 
- * Props:
- * - address: User's wallet address
- * - onGenerate: Callback function to refresh data after generating a code
- * 
- * Features:
- * - Generates unique referral codes
- * - Displays existing referral code
- * - Loading states and error handling
- * 
- * To modify:
- * - Update the card styling via bg-white and border-orange-200 classes
- * - Change the button appearance by modifying the Button component props
- * - Adjust the layout using space-y-4 and other spacing classes
+ * Styling:
+ * - Primary color accents for important elements
+ * - Clean white background with subtle borders
+ * - Consistent spacing and typography
  */
 
 import { useState } from "react"
@@ -79,16 +70,16 @@ export const ReferralSection = ({ address, referralLink, onGenerate }: ReferralS
 
   return (
     <section className="mb-8">
-      <Card className="bg-white shadow-lg border border-orange-200">
+      <Card className="bg-white shadow-lg border border-primary/20">
         <CardHeader>
-          <CardTitle className="text-orange-600">Referral Program</CardTitle>
+          <CardTitle className="text-primary">Referral Program</CardTitle>
         </CardHeader>
         <CardContent>
           {referralLink ? (
             <div className="space-y-4">
               <div>
                 <Label>Your Referral Code</Label>
-                <div className="mt-1 p-3 bg-gray-50 rounded-md border">
+                <div className="mt-1 p-3 bg-gray-50 rounded-md border border-primary/10">
                   {referralLink.referral_code}
                 </div>
               </div>
@@ -97,6 +88,7 @@ export const ReferralSection = ({ address, referralLink, onGenerate }: ReferralS
             <Button
               onClick={generateReferralLink}
               disabled={isSubmitting}
+              className="bg-primary hover:bg-primary/90"
             >
               {isSubmitting ? (
                 <>

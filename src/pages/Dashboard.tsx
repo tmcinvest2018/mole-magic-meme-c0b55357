@@ -3,16 +3,11 @@
  * 
  * Main dashboard page that combines all dashboard components.
  * 
- * Features:
- * - Wallet connection check
- * - Data fetching with React Query
- * - Loading states
- * - Error handling with toast notifications
- * 
- * To modify:
- * - Update the layout by adjusting the container classes
- * - Modify the background gradient via from-orange-50 to-white classes
- * - Change spacing with space-y-8 and other utility classes
+ * Styling:
+ * - Uses Ferrari Red (#D71920) for primary accents
+ * - Deep Black (#000000) for secondary elements
+ * - Dark Gray (#333333) for text
+ * - Gradient background from light to white for depth
  */
 
 import { useAccount } from 'wagmi'
@@ -30,7 +25,6 @@ const Dashboard = () => {
   const { address } = useAccount()
   const { toast } = useToast()
 
-  // Fetch XP points
   const { data: xpPoints, isLoading: isLoadingXP, refetch: refetchXP } = useQuery({
     queryKey: ['xp-points', address],
     queryFn: async () => {
@@ -113,7 +107,7 @@ const Dashboard = () => {
 
   if (!address) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-orange-50 to-white">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white">
         <p className="text-lg text-gray-600">Please connect your wallet to view your dashboard</p>
       </div>
     )
@@ -123,38 +117,33 @@ const Dashboard = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-orange-50 to-white">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50 to-white">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen bg-gradient-to-b from-orange-50 to-white space-y-8">
-      <h1 className="text-3xl font-bold mb-8 text-orange-600">Your Dashboard</h1>
+    <div className="container mx-auto px-4 py-8 min-h-screen bg-gradient-to-b from-gray-50 to-white space-y-8">
+      <h1 className="text-3xl font-bold mb-8 text-primary">Your Dashboard</h1>
       
-      {/* Wallet Overview */}
       <section className="mb-12">
         <WalletOverview address={address as `0x${string}`} hideViewDashboardButton={true} />
       </section>
 
-      {/* XP Overview */}
       <XPOverview xpPoints={xpPoints} />
 
-      {/* Submission Forms */}
       <SubmissionForms 
         address={address} 
         onSubmitSuccess={handleRefetchAll}
       />
 
-      {/* Referral Section */}
       <ReferralSection
         address={address}
         referralLink={referralLink}
         onGenerate={handleRefetchAll}
       />
 
-      {/* Submissions History */}
       <SubmissionsHistory
         contentSubmissions={contentSubmissions}
         socialSubmissions={socialSubmissions}

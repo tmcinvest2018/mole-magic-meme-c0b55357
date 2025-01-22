@@ -3,18 +3,10 @@
  * 
  * Displays tables of content and social media submissions.
  * 
- * Props:
- * - contentSubmissions: Array of content submission records
- * - socialSubmissions: Array of social media submission records
- * 
- * Features:
- * - Responsive tables for both content and social submissions
- * - Status and points display for each submission
- * 
- * To modify:
- * - Update table styling via bg-white and border-orange-200 classes
- * - Change the column layout by modifying the TableHead components
- * - Adjust spacing with space-y-6 and other classes
+ * Styling:
+ * - Uses white background with primary color accents
+ * - Consistent spacing and typography
+ * - Responsive table design
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -45,9 +37,9 @@ interface SubmissionsHistoryProps {
 export const SubmissionsHistory = ({ contentSubmissions, socialSubmissions }: SubmissionsHistoryProps) => {
   return (
     <section className="space-y-6">
-      <Card className="bg-white shadow-lg border border-orange-200">
+      <Card className="bg-white shadow-lg border border-primary/20">
         <CardHeader>
-          <CardTitle className="text-orange-600">Content Submissions</CardTitle>
+          <CardTitle className="text-primary">Content Submissions</CardTitle>
         </CardHeader>
         <CardContent>
           {contentSubmissions && contentSubmissions.length > 0 ? (
@@ -77,9 +69,9 @@ export const SubmissionsHistory = ({ contentSubmissions, socialSubmissions }: Su
         </CardContent>
       </Card>
 
-      <Card className="bg-white shadow-lg border border-orange-200">
+      <Card className="bg-white shadow-lg border border-primary/20">
         <CardHeader>
-          <CardTitle className="text-orange-600">Social Submissions</CardTitle>
+          <CardTitle className="text-primary">Social Submissions</CardTitle>
         </CardHeader>
         <CardContent>
           {socialSubmissions && socialSubmissions.length > 0 ? (
