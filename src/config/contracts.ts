@@ -1,4 +1,4 @@
-import { ethers } from "ethers/lib/ethers";
+import { ethers } from "ethers";
 
 // Contract addresses
 export const MORO_TOKEN = "0x2BE27D1471508C80f15c19e26895C9d182FA3556";
