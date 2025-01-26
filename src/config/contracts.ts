@@ -1,9 +1,9 @@
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 
 // Contract addresses
-export const MORO_TOKEN = "0x2BE27D1471508C80f15c19e26895C9d182FA3556";
-export const PRESALE_CONTRACT = "0x33B6f94577747E7a859B5b66fB042c76BEe3A3CD";
-export const USDT_CONTRACT = "0x3616C1a63F5Fc6510Ac4B720c2Ae0b739f69893B";
+export const MORO_TOKEN = '0x2BE27D1471508C80f15c19e26895C9d182FA3556';
+export const PRESALE_CONTRACT = '0x33B6f94577747E7a859B5b66fB042c76BEe3A3CD';
+export const USDT_CONTRACT = '0x3616C1a63F5Fc6510Ac4B720c2Ae0b739f69893B';
 
 // Current presale ID
 export const PRESALE_ID = 2;
@@ -12,50 +12,50 @@ export const PRESALE_ID = 2;
 export const PRESALE_ABI = [
   {
     inputs: [
-      { internalType: "uint256", name: "_id", type: "uint256" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: 'uint256', name: '_id', type: 'uint256' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
     ],
-    name: "buyWithEth",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "payable",
-    type: "function",
+    name: 'buyWithEth',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'payable',
+    type: 'function',
   },
   {
     inputs: [
-      { internalType: "uint256", name: "_id", type: "uint256" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: 'uint256', name: '_id', type: 'uint256' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
     ],
-    name: "buyWithUSDT",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "nonpayable",
-    type: "function",
+    name: 'buyWithUSDT',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
-      { internalType: "uint256", name: "_id", type: "uint256" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: 'uint256', name: '_id', type: 'uint256' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
     ],
-    name: "ethBuyHelper",
-    outputs: [{ internalType: "uint256", name: "ethAmount", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
+    name: 'ethBuyHelper',
+    outputs: [{ internalType: 'uint256', name: 'ethAmount', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [
-      { internalType: "uint256", name: "_id", type: "uint256" },
-      { internalType: "uint256", name: "amount", type: "uint256" },
+      { internalType: 'uint256', name: '_id', type: 'uint256' },
+      { internalType: 'uint256', name: 'amount', type: 'uint256' },
     ],
-    name: "usdtBuyHelper",
-    outputs: [{ internalType: "uint256", name: "usdPrice", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
+    name: 'usdtBuyHelper',
+    outputs: [{ internalType: 'uint256', name: 'usdPrice', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    inputs: [{ internalType: "address", name: "user", type: "address" }],
-    name: "getUserPurchased",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
+    inputs: [{ internalType: 'address', name: 'user', type: 'address' }],
+    name: 'getUserPurchased',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
   },
 ];
 
@@ -64,14 +64,14 @@ export const USDT_ABI = [
   {
     constant: false,
     inputs: [
-      { name: "_spender", type: "address" },
-      { name: "_value", type: "uint256" },
+      { name: '_spender', type: 'address' },
+      { name: '_value', type: 'uint256' },
     ],
-    name: "approve",
-    outputs: [{ name: "", type: "bool" }],
+    name: 'approve',
+    outputs: [{ name: '', type: 'bool' }],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ];
 
@@ -80,12 +80,12 @@ const getProvider = () => {
   if (typeof window !== 'undefined' && window.ethereum) {
     return new ethers.providers.Web3Provider(window.ethereum);
   }
-  throw new Error("MetaMask not installed");
+  throw new Error('MetaMask not installed');
 };
 
 const getSigner = async () => {
   const provider = getProvider();
-  await provider.send("eth_requestAccounts", []);
+  await provider.send('eth_requestAccounts', []);
   return provider.getSigner();
 };
 
@@ -103,7 +103,7 @@ export const calculateEthValue = async (amount: string): Promise<string> => {
     console.log('Required ETH value (wei):', ethValueWei.toString());
     return ethValueWei.toString();
   } catch (error) {
-    console.error("Error calculating ETH value:", error);
+    console.error('Error calculating ETH value:', error);
     throw error;
   }
 };
@@ -116,19 +116,19 @@ export const buyWithEth = async (amount: string): Promise<void> => {
   try {
     const signer = await getSigner();
     const presaleContract = new ethers.Contract(PRESALE_CONTRACT, PRESALE_ABI, signer);
-    
+
     // Calculate required ETH value
     const ethValue = await calculateEthValue(amount);
     console.log('Buying tokens with ETH value:', ethValue);
 
     // Execute purchase
     const tx = await presaleContract.buyWithEth(PRESALE_ID, ethers.utils.parseEther(amount), {
-      value: ethValue
+      value: ethValue,
     });
     await tx.wait();
     console.log('Purchase successful!');
   } catch (error) {
-    console.error("Error buying with ETH:", error);
+    console.error('Error buying with ETH:', error);
     throw error;
   }
 };
@@ -144,10 +144,14 @@ export const calculateUsdtValue = async (amount: string): Promise<string> => {
     const presaleContract = new ethers.Contract(PRESALE_CONTRACT, PRESALE_ABI, signer);
     console.log('Calculating USDT value for amount:', amount);
     const usdtValue = await presaleContract.usdtBuyHelper(PRESALE_ID, ethers.utils.parseEther(amount));
-    console.log('Required USDT value:', usdtValue.toString());
-    return usdtValue.toString();
+
+    // Adjust for USDT's 6 decimals
+    const adjustedUsdtValue = ethers.BigNumber.from(usdtValue).div(ethers.BigNumber.from(10).pow(12));
+
+    console.log('Required USDT value:', adjustedUsdtValue.toString());
+    return adjustedUsdtValue.toString();
   } catch (error) {
-    console.error("Error calculating USDT value:", error);
+    console.error('Error calculating USDT value:', error);
     throw error;
   }
 };
@@ -161,13 +165,16 @@ export const buyWithUSDT = async (amount: string): Promise<void> => {
     const signer = await getSigner();
     const presaleContract = new ethers.Contract(PRESALE_CONTRACT, PRESALE_ABI, signer);
     const usdtContract = new ethers.Contract(USDT_CONTRACT, USDT_ABI, signer);
-    
+
     // Calculate required USDT value
     const usdtValue = await calculateUsdtValue(amount);
     console.log('Approving USDT spend:', usdtValue);
 
+    // Adjust for USDT's 6 decimals
+    const adjustedUsdtValue = ethers.BigNumber.from(usdtValue).mul(ethers.BigNumber.from(10).pow(6));
+
     // Approve USDT spending
-    const approveTx = await usdtContract.approve(PRESALE_CONTRACT, usdtValue);
+    const approveTx = await usdtContract.approve(PRESALE_CONTRACT, adjustedUsdtValue);
     await approveTx.wait();
     console.log('USDT approved');
 
@@ -176,7 +183,7 @@ export const buyWithUSDT = async (amount: string): Promise<void> => {
     await tx.wait();
     console.log('Purchase successful!');
   } catch (error) {
-    console.error("Error buying with USDT:", error);
+    console.error('Error buying with USDT:', error);
     throw error;
   }
 };
@@ -196,7 +203,7 @@ export const getUserPurchased = async (userAddress: string): Promise<string> => 
     console.log('User purchased amount:', formatted);
     return formatted;
   } catch (error) {
-    console.error("Error fetching user purchased tokens:", error);
-    return "0";
+    console.error('Error fetching user purchased tokens:', error);
+    return '0';
   }
 };
